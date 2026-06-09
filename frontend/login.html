@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Zahab Gold — Login</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<style>
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)}
+.login-box{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:36px;width:380px;max-width:95vw}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .sym{font-size:40px;color:var(--gold)}
+.login-logo h1{font-family:Georgia,serif;font-size:22px;color:var(--gold);letter-spacing:2px;margin:6px 0 2px}
+.login-logo p{font-size:10px;color:var(--tx3);letter-spacing:3px;text-transform:uppercase}
+.login-err{background:#3a1a1a;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:none}
+.lang-row{display:flex;justify-content:flex-end;margin-bottom:16px}
+.login-footer{text-align:center;margin-top:20px;font-size:10px;color:var(--tx3);letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="lang-row"><button onclick="toggleLoginLang()" id="ll-btn" style="background:var(--bg3);border:1px solid var(--brd);color:var(--tx2);padding:3px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700">AR</button></div>
+  <div class="login-logo">
+    <div class="sym">⚜</div>
+    <h1 id="ll-title">ZAHAB</h1>
+    <p id="ll-sub">Gold Management System</p>
+  </div>
+  <div class="login-err" id="login-err"></div>
+  <div class="fg"><label class="fl" id="ll-email">Email Address</label><input class="fi" type="email" id="l-email" placeholder="admin@zahab.com" autocomplete="email"/></div>
+  <div class="fg"><label class="fl" id="ll-pass">Password</label><input class="fi" type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"/></div>
+  <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px;padding:11px" onclick="doLogin()" id="ll-btn-login"><i class="ti ti-login"></i> Sign In</button>
+  <div class="login-footer" id="ll-footer">Zahab Gold v2 • Kuwait & GCC</div>
+</div>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+<script src="assets/js/api.js"></script>
+<script>
+// Check if already logged in
+if(localStorage.getItem('zahab_token')&&localStorage.getItem('zahab_user')){window.location.href='/';}
+
+// Show timeout message
+if(new URLSearchParams(location.search).get('timeout')==='1'){const err=document.getElementById('login-err');err.textContent='Session expired — please log in again.';err.style.display='block';}
+
+let _lang='en';
+function toggleLoginLang(){
+  _lang=_lang==='en'?'ar':'en';
+  document.getElementById('ll-btn').textContent=_lang==='ar'?'EN':'AR';
+  document.documentElement.setAttribute('dir',_lang==='ar'?'rtl':'ltr');
+  if(_lang==='ar'){document.getElementById('ll-title').textContent='ذهب';document.getElementById('ll-sub').textContent='نظام إدارة الذهب';document.getElementById('ll-email').textContent='البريد الإلكتروني';document.getElementById('ll-pass').textContent='كلمة المرور';document.getElementById('ll-btn-login').innerHTML='<i class="ti ti-login"></i> دخول';document.getElementById('ll-footer').textContent='نظام ذهب الإصدار 2 — الكويت وبلدان الخليج';}else{document.getElementById('ll-title').textContent='ZAHAB';document.getElementById('ll-sub').textContent='Gold Management System';document.getElementById('ll-email').textContent='Email Address';document.getElementById('ll-pass').textContent='Password';document.getElementById('ll-btn-login').innerHTML='<i class="ti ti-login"></i> Sign In';document.getElementById('ll-footer').textContent='Zahab Gold v2 • Kuwait & GCC';}
+}
+
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();const pass=document.getElementById('l-pass').value;
+  const err=document.getElementById('login-err');err.style.display='none';
+  if(!email||!pass){err.textContent=_lang==='ar'?'يرجى إدخال البريد الإلكتروني وكلمة المرور':'Please enter email and password';err.style.display='block';return;}
+  const btn=document.getElementById('ll-btn-login');btn.disabled=true;btn.textContent=_lang==='ar'?'جارٍ الدخول...':'Signing in...';
+  try{
+    const r=await API.login(email,pass);
+    API.setToken(r.token);
+    localStorage.setItem('zahab_user',JSON.stringify(r.user));
+    localStorage.setItem('zahab_lang',_lang);
+    window.location.href='/';
+  }catch(e){
+    err.textContent=_lang==='ar'?'بريد إلكتروني أو كلمة مرور خاطئة':'Invalid email or password';
+    err.style.display='block';
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-login"></i> '+(lang==='ar'?'دخول':'Sign In');
+  }
+}
+</script>
+</body>
+</html>

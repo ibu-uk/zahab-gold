@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Zahab Gold v2</title>
+<link rel="stylesheet" href="assets/css/style.css"/>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-sym">⚜</div>
+      <div class="logo-name">ZAHAB</div>
+      <div class="logo-sub">Gold Management</div>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Main</div>
+      <a class="nav-item active" href="#dashboard" onclick="nav('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a class="nav-item" href="#pos" onclick="nav('pos',this)"><i class="ti ti-shopping-cart"></i>Point of Sale</a>
+      <a class="nav-item" href="#invoices" onclick="nav('invoices',this)"><i class="ti ti-file-invoice"></i>Invoices</a>
+      <a class="nav-item" href="#orders" onclick="nav('orders',this)"><i class="ti ti-package"></i>Special Orders</a>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Inventory</div>
+      <a class="nav-item" href="#items" onclick="nav('items',this)"><i class="ti ti-diamond"></i>Items Catalog</a>
+      <a class="nav-item" href="#add-item" onclick="nav('add-item',this)"><i class="ti ti-plus"></i>Add New Item</a>
+      <a class="nav-item" href="#karats" onclick="nav('karats',this)"><i class="ti ti-chart-bar"></i>Karat Prices</a>
+      <a class="nav-item" href="#low-stock" onclick="nav('low-stock',this)"><i class="ti ti-alert-triangle"></i>Low Stock</a>
+      <a class="nav-item" href="#categories" onclick="nav('categories',this)"><i class="ti ti-category"></i>Categories</a>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Sales</div>
+      <a class="nav-item" href="#buyback" onclick="nav('buyback',this)"><i class="ti ti-coins"></i>Buyback</a>
+      <a class="nav-item" href="#returns" onclick="nav('returns',this)"><i class="ti ti-rotate-clockwise"></i>Returns</a>
+      <a class="nav-item" href="#purchases" onclick="nav('purchases',this)"><i class="ti ti-package-import"></i>Purchase Orders</a>
+      <a class="nav-item" href="#installments" onclick="nav('installments',this)"><i class="ti ti-credit-card"></i>Installments</a>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">Business</div>
+      <a class="nav-item" href="#branches" onclick="nav('branches',this)"><i class="ti ti-building-store"></i>Branches (GCC)</a>
+      <a class="nav-item" href="#suppliers" onclick="nav('suppliers',this)"><i class="ti ti-truck"></i>Suppliers</a>
+      <a class="nav-item" href="#currency" onclick="nav('currency',this)"><i class="ti ti-currency-dollar"></i>Currency</a>
+      <a class="nav-item" href="#reports" onclick="nav('reports',this)"><i class="ti ti-chart-line"></i>Reports</a>
+    </div>
+    <div class="nav-sec">
+      <div class="nav-lbl">System</div>
+      <a class="nav-item" href="#customers" onclick="nav('customers',this)"><i class="ti ti-users"></i>Customers</a>
+      <a class="nav-item" href="#users" onclick="nav('users',this)"><i class="ti ti-user-cog"></i>Users &amp; Roles</a>
+      <a class="nav-item" href="#audit" onclick="nav('audit',this)"><i class="ti ti-history"></i>Audit Log</a>
+      <a class="nav-item" href="#settings" onclick="nav('settings',this)"><i class="ti ti-settings"></i>Settings</a>
+      <a class="nav-item" href="#" onclick="logout()"><i class="ti ti-logout"></i>Logout</a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pg-title">Dashboard</div>
+      <div class="gold-ticker"><span class="live-dot"></span>XAU/USD <span id="gold-px" style="color:var(--green)">$3,200.00</span></div>
+      <div class="branch-badge" id="branch-lbl" onclick="nav('branches')"><i class="ti ti-building-store" style="font-size:13px"></i> <span id="act-branch">Loading...</span></div>
+      <div class="curr-badge" id="curr-lbl">KWD</div>
+      <button class="lang-toggle" onclick="toggleLang()" id="lang-btn">AR</button>
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold-d);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--tx);cursor:pointer" id="user-av"></div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="pg-dashboard">
+        <div id="dash-low-strip" class="alert-strip" style="display:none" onclick="nav('low-stock')"><i class="ti ti-alert-triangle"></i><span></span><i class="ti ti-chevron-right" style="margin-left:auto"></i></div>
+        <div class="kpi-row" id="dash-stats">
+          <div class="stat-card gold-brd"><div class="stat-lbl">Today's Sales</div><div class="stat-val gold" id="ds-sales">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Invoices Today</div><div class="stat-val" id="ds-inv">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Gold Sold (g)</div><div class="stat-val" id="ds-weight">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Special Orders</div><div class="stat-val" id="ds-orders">—</div></div>
+        </div>
+        <div class="grid2" style="margin-bottom:16px">
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-chart-line"></i>Gold Rate (30 days)</div></div><div class="chart-wrap"><canvas id="gold-chart"></canvas></div></div>
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-chart-bar"></i>Sales (last 14 days)</div></div><div class="chart-wrap"><canvas id="sales-chart"></canvas></div></div>
+        </div>
+        <div class="grid2">
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-clock"></i>Recent Invoices</div><button class="btn btn-out btn-sm" onclick="nav('invoices')">View All</button></div><table><thead><tr><th>Invoice #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead><tbody id="dash-inv-list"><tr><td colspan="4" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-package"></i>Pending Orders</div><button class="btn btn-out btn-sm" onclick="nav('orders')">View All</button></div><div id="dash-orders-list"><div class="loading"><i class="ti ti-refresh"></i>Loading...</div></div></div>
+        </div>
+      </div>
+
+      <!-- POINT OF SALE -->
+      <div class="page" id="pg-pos">
+        <div class="pos-layout">
+          <div style="overflow-y:auto">
+            <div class="scan-input-wrap">
+              <i class="ti ti-scan" style="color:var(--tx3)"></i>
+              <input id="pos-scan" class="fi" placeholder="Scan barcode or type SKU + Enter..." onkeypress="posBarcodeScan(event)" style="font-family:monospace"/>
+            </div>
+            <div class="search-box"><i class="ti ti-search"></i><input id="pos-q" placeholder="Search items by name, SKU, or Arabic..." oninput="posSearch()"/></div>
+            <div class="filter-bar" id="pos-karat-filter">
+              <button class="chip active" onclick="setPosKarat('all',this)">All</button>
+              <button class="chip" onclick="setPosKarat('24K',this)">24K</button>
+              <button class="chip" onclick="setPosKarat('22K',this)">22K</button>
+              <button class="chip" onclick="setPosKarat('21K',this)">21K</button>
+              <button class="chip" onclick="setPosKarat('18K',this)">18K</button>
+              <button class="chip" onclick="setPosKarat('14K',this)">14K</button>
+            </div>
+            <div class="items-grid" id="pos-grid"><div class="loading"><i class="ti ti-refresh"></i>Loading items...</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div id="hold-panel" class="hold-panel" style="display:none"></div>
+            <div class="card" style="flex:1;overflow-y:auto">
+              <div class="card-hdr"><div class="card-title"><i class="ti ti-shopping-cart"></i>Cart</div><button class="btn btn-out btn-sm" onclick="clearCart()"><i class="ti ti-trash"></i></button></div>
+              <div id="cart-body"><div class="empty"><i class="ti ti-diamond"></i>No items added</div></div>
+            </div>
+            <div class="card">
+              <div class="fr2">
+                <div class="fg"><label class="fl">Customer</label><select class="fi" id="pos-cust"><option value="">Walk-in</option></select></div>
+                <div class="fg"><label class="fl">Currency</label><select class="fi" id="pos-curr" onchange="updateCartUI()"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option><option value="USD">USD</option></select></div>
+              </div>
+              <div class="fg"><label class="fl">Payment</label><select class="fi" id="pos-pay"><option value="cash">Cash</option><option value="card">Credit Card</option><option value="knet">KNET</option><option value="bank_transfer">Bank Transfer</option><option value="installment">Installment</option></select></div>
+              <div class="inv-total-box" style="margin:0 0 10px">
+                <div class="inv-total-row"><span>Subtotal</span><span id="ct-sub">0.000</span></div>
+                <div class="inv-total-row"><span>Making</span><span id="ct-making">0.000</span></div>
+                <div class="inv-total-row"><span>Discount <input type="number" id="ct-disc" value="0" min="0" max="100" style="width:46px;background:var(--bg3);border:1px solid var(--brd);color:var(--tx);padding:1px 5px;border-radius:4px;font-size:11px" oninput="updateCartTotal()"/>%</span><span id="ct-disc-val">0.000</span></div>
+                <div class="inv-total-row"><span id="ct-vat-lbl">VAT (0%)</span><span id="ct-vat">0.000</span></div>
+                <div class="inv-total-row grand"><span>TOTAL</span><span id="ct-total">KWD 0.000</span></div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-out" style="flex:1" onclick="holdCart()"><i class="ti ti-pause"></i>Hold</button>
+                <button class="btn btn-gold" style="flex:2" onclick="completeSale()"><i class="ti ti-check"></i>Complete Sale</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVOICES -->
+      <div class="page" id="pg-invoices">
+        <div class="sec-hdr"><div class="sec-ttl">Invoices</div><div style="display:flex;gap:8px"><button class="btn btn-gold btn-sm" onclick="nav('pos')"><i class="ti ti-plus"></i>New Sale</button><button class="btn btn-out btn-sm" onclick="exportCSV(window._lastInvoices||[],'invoices')"><i class="ti ti-download"></i>Export</button></div></div>
+        <div class="filter-bar"><button class="chip active" onclick="setInvFilter('',this)">All</button><button class="chip" onclick="setInvFilter('paid',this)">Paid</button><button class="chip" onclick="setInvFilter('pending',this)">Pending</button><button class="chip" onclick="setInvFilter('partial',this)">Partial</button><button class="chip" onclick="setInvFilter('refunded',this)">Refunded</button></div>
+        <div class="card"><table><thead><tr><th>Invoice #</th><th>Date</th><th>Customer</th><th>Branch</th><th>Total</th><th>Currency</th><th>Payment</th><th>Status</th><th></th></tr></thead><tbody id="inv-table"><tr><td colspan="9" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- SPECIAL ORDERS -->
+      <div class="page" id="pg-orders">
+        <div class="sec-hdr"><div class="sec-ttl">Special Orders</div><button class="btn btn-gold btn-sm" onclick="openOrderModal()"><i class="ti ti-plus"></i>New Order</button></div>
+        <div class="stats-grid"><div class="stat-card"><div class="stat-lbl">Total</div><div class="stat-val gold" id="ord-total">—</div></div><div class="stat-card"><div class="stat-lbl">Pending</div><div class="stat-val" style="color:var(--blue)" id="ord-pending">—</div></div><div class="stat-card"><div class="stat-lbl">In Progress</div><div class="stat-val" style="color:var(--orange)" id="ord-progress">—</div></div><div class="stat-card"><div class="stat-lbl">Ready</div><div class="stat-val" style="color:var(--green)" id="ord-ready">—</div></div></div>
+        <div class="card"><table><thead><tr><th>Order #</th><th>Customer</th><th>Description</th><th>Branch</th><th>Karat</th><th>Weight</th><th>Amount</th><th>Due</th><th>Status</th><th></th></tr></thead><tbody id="ord-table"><tr><td colspan="10" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- ITEMS CATALOG -->
+      <div class="page" id="pg-items">
+        <div class="sec-hdr"><div class="sec-ttl">Items Catalog</div><button class="btn btn-gold btn-sm" onclick="nav('add-item')"><i class="ti ti-plus"></i>Add Item</button></div>
+        <div class="search-box"><i class="ti ti-search"></i><input placeholder="Search items (EN/AR/SKU)..." id="cat-q" oninput="loadCatalog()"/></div>
+        <div class="filter-bar" id="cat-filter"><button class="chip active" onclick="setCatFilter('',this)">All</button></div>
+        <div class="items-grid" id="cat-grid"><div class="loading"><i class="ti ti-refresh"></i>Loading...</div></div>
+      </div>
+
+      <!-- ADD ITEM -->
+      <div class="page" id="pg-add-item">
+        <div class="sec-hdr"><div class="sec-ttl">Add New Item</div><button class="btn btn-out btn-sm" onclick="nav('items')"><i class="ti ti-arrow-left"></i>Back</button></div>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px">
+          <div>
+            <div class="card">
+              <div class="card-hdr"><div class="card-title"><i class="ti ti-info-circle"></i>Item Details</div></div>
+              <div class="fr2"><div class="fg"><label class="fl">Item Name (EN)</label><input class="fi" id="ni-name" placeholder="Gold Ring 21K"/></div><div class="fg"><label class="fl">Item Name (AR)</label><input class="fi" id="ni-name-ar" placeholder="خاتم ذهب ٢١" style="direction:rtl"/></div></div>
+              <div class="fr2"><div class="fg"><label class="fl">SKU / Barcode</label><input class="fi" id="ni-sku" placeholder="GR-21K-001"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="ni-cat"></select></div></div>
+              <div class="fr3"><div class="fg"><label class="fl">Karat</label><select class="fi" id="ni-karat"><option>24K</option><option>22K</option><option selected>21K</option><option>18K</option><option>14K</option><option>9K</option></select></div><div class="fg"><label class="fl">Weight (g)</label><input class="fi" type="number" step="0.01" id="ni-weight" oninput="previewPrice()"/></div><div class="fg"><label class="fl">Making Charges (%)</label><input class="fi" type="number" id="ni-making" value="8" oninput="previewPrice()"/></div></div>
+              <div class="fr2"><div class="fg"><label class="fl">Stock Qty</label><input class="fi" type="number" id="ni-qty" value="1"/></div><div class="fg"><label class="fl">Branch</label><select class="fi" id="ni-branch"></select></div></div>
+              <div class="fg"><label class="fl">Description (EN)</label><textarea class="fi" rows="2" id="ni-desc"></textarea></div>
+              <div class="fg"><label class="fl">Description (AR)</label><textarea class="fi" rows="2" id="ni-desc-ar" style="direction:rtl"></textarea></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:14px">
+              <div class="card-hdr"><div class="card-title"><i class="ti ti-photo"></i>Item Images</div></div>
+              <div class="upload-zone" onclick="document.getElementById('ni-imgs').click()"><i class="ti ti-cloud-upload" style="font-size:28px;color:var(--tx3);display:block;margin-bottom:6px"></i><div style="font-size:12px;color:var(--tx2)">Click to upload images</div><div style="font-size:10px;color:var(--tx3);margin-top:3px">JPG, PNG up to 5MB each</div></div>
+              <input type="file" id="ni-imgs" accept="image/*" multiple style="display:none" onchange="previewImgs(event)"/>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px" id="ni-img-prev"></div>
+            </div>
+            <div class="card">
+              <div class="card-hdr"><div class="card-title"><i class="ti ti-calculator"></i>Price Preview</div></div>
+              <div id="price-prev-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px"></div>
+              <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="saveItem()"><i class="ti ti-check"></i>Save Item</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARAT PRICES -->
+      <div class="page" id="pg-karats">
+        <div class="sec-hdr"><div class="sec-ttl">Gold Karat Price Board</div><div style="display:flex;gap:8px"><span style="font-size:11px;color:var(--tx3);align-self:center"><span class="live-dot"></span>Live</span><button class="btn btn-out btn-sm" onclick="fetchLiveGoldRate()"><i class="ti ti-world"></i>Live Rate</button><button class="btn btn-out btn-sm" onclick="loadKarats()"><i class="ti ti-refresh"></i>Refresh</button></div></div>
+        <div style="background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--orange);margin-bottom:16px;display:flex;align-items:center;gap:8px"><i class="ti ti-alert-triangle"></i><span id="karat-rate-notice">Loading gold rate...</span></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)" id="karat-grid"></div>
+        <div class="grid2">
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-adjustments"></i>Making Charges by Category</div></div><table><thead><tr><th>Category</th><th>Karat</th><th>Making %</th><th></th></tr></thead><tbody id="making-table"></tbody></table></div>
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-coin"></i>Set Gold Rate (Manual)</div></div><div class="fg"><label class="fl">Gold Rate USD/oz</label><input class="fi" type="number" step="0.01" id="gold-rate-input" placeholder="3200.00"/></div><button class="btn btn-gold btn-sm" onclick="saveGoldRate()"><i class="ti ti-check"></i>Update Rate</button></div>
+        </div>
+      </div>
+
+      <!-- LOW STOCK -->
+      <div class="page" id="pg-low-stock">
+        <div class="sec-hdr"><div class="sec-ttl">Low Stock Alerts <span id="low-stock-count" class="badge red" style="margin-left:8px">0</span></div><button class="btn btn-gold btn-sm" onclick="nav('purchases')"><i class="ti ti-package-import"></i>Create PO</button></div>
+        <div class="card"><table><thead><tr><th>SKU</th><th>Item</th><th>Branch</th><th>Karat</th><th>Current Qty</th><th>Min Qty</th><th>Action</th></tr></thead><tbody id="low-stock-table"><tr><td colspan="7" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="page" id="pg-categories">
+        <div class="sec-hdr"><div class="sec-ttl">Item Categories</div><button class="btn btn-gold btn-sm" onclick="openCategoryModal()"><i class="ti ti-plus"></i>New Category</button></div>
+        <div class="cat-manage-grid" id="cat-manage-grid"><div class="loading"><i class="ti ti-refresh"></i>Loading...</div></div>
+      </div>
+
+      <!-- BUYBACK -->
+      <div class="page" id="pg-buyback">
+        <div class="sec-hdr"><div class="sec-ttl">Buyback — Buy Gold from Customer</div></div>
+        <div class="grid2" style="margin-bottom:16px">
+          <div class="stat-card gold-brd"><div class="stat-lbl">Total Paid Today</div><div class="stat-val gold" id="bb-total-paid">—</div></div>
+          <div class="stat-card"><div class="stat-lbl">Buyback Records</div><div class="stat-val" id="bb-count">—</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:16px">
+          <div class="card">
+            <div class="card-hdr"><div class="card-title"><i class="ti ti-history"></i>Buyback Records</div></div>
+            <table><thead><tr><th>Number</th><th>Date</th><th>Customer</th><th>Branch</th><th>Karat</th><th>Gross</th><th>Net</th><th>Paid</th><th>Method</th></tr></thead><tbody id="buyback-table"><tr><td colspan="9" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="card-hdr"><div class="card-title"><i class="ti ti-coins"></i>New Buyback</div></div>
+              <div class="fg"><label class="fl">Customer</label><select class="fi" id="bb-cust"><option value="">Walk-in</option></select></div>
+              <div class="fg"><label class="fl">Branch</label><select class="fi" id="bb-branch"></select></div>
+              <div class="fg"><label class="fl">Description</label><input class="fi" id="bb-desc" placeholder="Old ring, coin, bar..."/></div>
+              <div class="fr2"><div class="fg"><label class="fl">Karat</label><select class="fi" id="bb-karat" onchange="calcBuybackPreview()"><option>24K</option><option>22K</option><option selected>21K</option><option>18K</option><option>14K</option><option>9K</option></select></div><div class="fg"><label class="fl">Gross Weight (g)</label><input class="fi" type="number" step="0.001" id="bb-gross" oninput="calcBuybackPreview()"/></div></div>
+              <div class="fr2"><div class="fg"><label class="fl">Deduction (%)</label><input class="fi" type="number" id="bb-deduct" value="0" min="0" max="50" oninput="calcBuybackPreview()"/></div><div class="fg"><label class="fl">Currency</label><select class="fi" id="bb-curr" onchange="calcBuybackPreview()"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option></select></div></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input type="checkbox" id="bb-tested" style="accent-color:var(--gold)"/><label for="bb-tested" style="font-size:12px;color:var(--tx2)">Purity tested</label></div>
+              <div class="calc-box">
+                <div style="font-size:11px;color:var(--tx3)">Net Weight</div>
+                <div style="font-size:16px;font-weight:700;color:var(--tx)" id="bb-net-weight">—</div>
+                <div style="font-size:11px;color:var(--tx3);margin-top:8px">Amount Payable</div>
+                <div class="calc-amount" id="bb-amount-preview">—</div>
+                <div class="calc-rate" id="bb-per-gram">Enter weight to calculate</div>
+              </div>
+              <input type="hidden" id="bb-net"/>
+              <div class="fg" style="margin-top:10px"><label class="fl">Confirm Amount</label><input class="fi" type="number" step="0.001" id="bb-amount" placeholder="0.000"/></div>
+              <div class="fg"><label class="fl">Payment Method</label><select class="fi" id="bb-payment"><option value="cash">Cash</option><option value="bank_transfer">Bank Transfer</option></select></div>
+              <div class="fg"><label class="fl">Notes</label><input class="fi" id="bb-notes" placeholder="Optional notes..."/></div>
+              <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="saveBuyback()"><i class="ti ti-check"></i>Record Buyback</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RETURNS -->
+      <div class="page" id="pg-returns">
+        <div class="sec-hdr"><div class="sec-ttl">Returns &amp; Refunds</div><div style="font-size:12px;color:var(--tx3)">Open an invoice and click the return icon to initiate</div></div>
+        <div class="card"><table><thead><tr><th>Return #</th><th>Date</th><th>Invoice</th><th>Customer</th><th>Branch</th><th>Type</th><th>Refund</th><th>Method</th><th>Status</th><th>Actions</th></tr></thead><tbody id="returns-table"><tr><td colspan="10" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- PURCHASE ORDERS -->
+      <div class="page" id="pg-purchases">
+        <div class="sec-hdr"><div class="sec-ttl">Purchase Orders</div><button class="btn btn-gold btn-sm" onclick="openPurchaseModal()"><i class="ti ti-plus"></i>New PO</button></div>
+        <div class="card"><table><thead><tr><th>PO #</th><th>Date</th><th>Branch</th><th>Supplier</th><th>Total</th><th>Order Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="po-table"><tr><td colspan="8" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- INSTALLMENTS -->
+      <div class="page" id="pg-installments">
+        <div class="sec-hdr"><div class="sec-ttl">Installment Plans</div><div style="font-size:12px;color:var(--tx3)">Create installment plans from the invoice view</div></div>
+        <div class="card"><table><thead><tr><th>Plan #</th><th>Invoice</th><th>Customer</th><th>Total</th><th>Per Installment</th><th>Count</th><th>Progress</th><th>Overdue</th><th>Status</th><th></th></tr></thead><tbody id="inst-table"><tr><td colspan="10" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- BRANCHES -->
+      <div class="page" id="pg-branches">
+        <div class="sec-hdr"><div class="sec-ttl">GCC Branches</div><button class="btn btn-gold btn-sm" onclick="openBranchModal()"><i class="ti ti-plus"></i>Add Branch</button></div>
+        <div class="tabs"><div class="tab active" onclick="switchTab('branch','overview',this)">Overview</div><div class="tab" onclick="switchTab('branch','transfer',this)">Stock Transfer</div><div class="tab" onclick="switchTab('branch','compare',this)">Comparison</div></div>
+        <div id="branch-tab-overview" class="branch-tab"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px" id="branch-grid"></div></div>
+        <div id="branch-tab-transfer" class="branch-tab" style="display:none">
+          <div class="card" style="max-width:560px">
+            <div class="card-hdr"><div class="card-title"><i class="ti ti-arrows-transfer-up"></i>Transfer Stock</div></div>
+            <div class="fr2"><div class="fg"><label class="fl">From Branch</label><select class="fi" id="tr-from"></select></div><div class="fg"><label class="fl">To Branch</label><select class="fi" id="tr-to"></select></div></div>
+            <div class="fg"><label class="fl">Item</label><select class="fi" id="tr-item"></select></div>
+            <div class="fr2"><div class="fg"><label class="fl">Quantity</label><input class="fi" type="number" id="tr-qty" value="1" min="1"/></div><div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="tr-date"/></div></div>
+            <div class="fg"><label class="fl">Notes</label><input class="fi" id="tr-notes" placeholder="Reason for transfer..."/></div>
+            <button class="btn btn-gold" onclick="doTransfer()"><i class="ti ti-arrows-transfer-up"></i>Transfer Stock</button>
+          </div>
+        </div>
+        <div id="branch-tab-compare" class="branch-tab" style="display:none"><div class="card"><table><thead><tr><th>Branch</th><th>Country</th><th>Currency</th><th>Invoices</th><th>Revenue</th><th>Gold (g)</th><th>Status</th></tr></thead><tbody id="branch-cmp-table"></tbody></table></div></div>
+      </div>
+
+      <!-- SUPPLIERS -->
+      <div class="page" id="pg-suppliers">
+        <div class="sec-hdr"><div class="sec-ttl">Suppliers</div><button class="btn btn-gold btn-sm" onclick="openSupplierModal()"><i class="ti ti-plus"></i>Add Supplier</button></div>
+        <div class="search-box"><i class="ti ti-search"></i><input placeholder="Search suppliers..." id="sup-q" oninput="loadSuppliers()"/></div>
+        <div class="card"><table><thead><tr><th>Name</th><th>Arabic</th><th>Country</th><th>Contact</th><th>Phone</th><th>Email</th><th></th></tr></thead><tbody id="suppliers-table"><tr><td colspan="7" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- CURRENCY -->
+      <div class="page" id="pg-currency">
+        <div class="sec-hdr"><div class="sec-ttl">GCC Currency Management</div><button class="btn btn-out btn-sm" onclick="loadCurrency()"><i class="ti ti-refresh"></i>Refresh</button></div>
+        <div class="grid2">
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-currency-dollar"></i>Exchange Rates (vs USD)</div></div><div id="curr-list"></div></div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title"><i class="ti ti-calculator"></i>Currency Converter</div></div>
+            <div class="fg"><label class="fl">Amount</label><input class="fi" type="number" id="conv-amt" value="100" oninput="doConvert()"/></div>
+            <div class="fr2"><div class="fg"><label class="fl">From</label><select class="fi" id="conv-from" onchange="doConvert()"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option><option value="USD">USD</option></select></div><div class="fg"><label class="fl">To</label><select class="fi" id="conv-to" onchange="doConvert()"><option value="AED">AED</option><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option><option value="USD">USD</option></select></div></div>
+            <div class="inv-total-box" style="text-align:center;margin-bottom:0"><div style="font-size:28px;font-weight:700;color:var(--gold);font-family:Georgia,serif" id="conv-result">—</div><div style="font-size:11px;color:var(--tx3);margin-top:4px" id="conv-rate-lbl">—</div></div>
+            <div style="margin-top:16px"><div class="card-hdr"><div class="card-title"><i class="ti ti-coin"></i>Gold per Gram (24K)</div></div><div id="gold-per-curr"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="pg-reports">
+        <div class="sec-hdr">
+          <div class="sec-ttl">Reports &amp; Analytics</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="fi" type="date" id="rep-from" style="width:150px"/>
+            <span style="color:var(--tx3)">to</span>
+            <input class="fi" type="date" id="rep-to" style="width:150px"/>
+            <button class="btn btn-gold btn-sm" onclick="loadReport()"><i class="ti ti-chart-bar"></i>Run Report</button>
+            <button class="btn btn-out btn-sm" onclick="exportReport('sales')"><i class="ti ti-download"></i>CSV</button>
+          </div>
+        </div>
+        <div class="stats-grid" id="rep-stats"></div>
+        <div class="card" style="margin-bottom:16px"><div class="card-hdr"><div class="card-title"><i class="ti ti-chart-line"></i>Revenue Trend</div><div style="display:flex;gap:6px"><button class="btn btn-out btn-sm" onclick="exportReport('karat')"><i class="ti ti-download"></i>Karat CSV</button><button class="btn btn-out btn-sm" onclick="exportReport('branch')"><i class="ti ti-download"></i>Branch CSV</button></div></div><div class="chart-wrap"><canvas id="rep-chart"></canvas></div></div>
+        <div class="grid2">
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-diamond"></i>Sales by Karat</div></div><table><thead><tr><th>Karat</th><th>Weight (g)</th><th>Revenue</th><th>Units</th></tr></thead><tbody id="rep-karat"></tbody></table></div>
+          <div class="card"><div class="card-hdr"><div class="card-title"><i class="ti ti-building-store"></i>Sales by Branch</div></div><table><thead><tr><th>Branch</th><th>Invoices</th><th>Revenue</th></tr></thead><tbody id="rep-branch"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div class="page" id="pg-customers">
+        <div class="sec-hdr"><div class="sec-ttl">Customers</div><button class="btn btn-gold btn-sm" onclick="openAddCustomer()"><i class="ti ti-plus"></i>Add Customer</button></div>
+        <div class="search-box"><i class="ti ti-search"></i><input placeholder="Search by name, phone, ID number..." id="cust-q" oninput="loadCustomers()"/></div>
+        <div class="card"><table><thead><tr><th>Name</th><th>Phone</th><th>Nationality</th><th>ID Number</th><th>Loyalty Pts</th><th>Branch</th><th></th></tr></thead><tbody id="cust-table"><tr><td colspan="7" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="pg-users">
+        <div class="sec-hdr"><div class="sec-ttl">Users &amp; Roles</div><button class="btn btn-gold btn-sm" onclick="openAddUser()"><i class="ti ti-plus"></i>Add User</button></div>
+        <div class="stats-grid" id="usr-stats"></div>
+        <div class="card"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Branch</th><th>Phone</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usr-table"><tr><td colspan="8" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- AUDIT LOG -->
+      <div class="page" id="pg-audit">
+        <div class="sec-hdr"><div class="sec-ttl">Audit Log</div><button class="btn btn-out btn-sm" onclick="loadAuditLog()"><i class="ti ti-refresh"></i>Refresh</button></div>
+        <div class="card"><table><thead><tr><th>Timestamp</th><th>User</th><th>Module</th><th>Action</th><th>Details</th></tr></thead><tbody id="audit-table"><tr><td colspan="5" class="loading"><i class="ti ti-refresh"></i>Loading...</td></tr></tbody></table></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="pg-settings">
+        <div class="sec-ttl" style="margin-bottom:16px">System Settings</div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-hdr"><div class="card-title"><i class="ti ti-building"></i>Shop Information</div></div>
+            <div class="fg"><label class="fl">Shop Name (EN)</label><input class="fi" id="set-name" value="Zahab Gold & Jewelry"/></div>
+            <div class="fg"><label class="fl">Shop Name (AR)</label><input class="fi" id="set-name-ar" value="ذهب للمجوهرات" style="direction:rtl"/></div>
+            <div class="fg"><label class="fl">Invoice Prefix</label><input class="fi" id="set-prefix" value="ZHB-"/></div>
+            <div class="fg"><label class="fl">Default Currency</label><select class="fi" id="set-curr"><option value="KWD">KWD – Kuwaiti Dinar</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option></select></div>
+            <div class="fg"><label class="fl">Session Timeout (minutes)</label><input class="fi" type="number" id="set-timeout" value="30" min="5"/></div>
+            <button class="btn btn-gold btn-sm" onclick="saveSettings()"><i class="ti ti-check"></i>Save Settings</button>
+          </div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title"><i class="ti ti-file-invoice"></i>Invoice Settings</div></div>
+            <div class="fg"><label class="fl">Invoice Language</label><select class="fi" id="set-lang"><option value="english">English</option><option value="arabic">Arabic</option><option value="bilingual" selected>Bilingual (EN + AR)</option></select></div>
+            <div class="fg"><label class="fl">VAT Rate (%) — overridden per country</label><input class="fi" type="number" id="set-vat" value="0"/></div>
+            <div class="fg"><label class="fl">Show Gold Rate on Invoice</label><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="set-show-rate" checked style="accent-color:var(--gold)"/><span style="font-size:13px;color:var(--tx2)">Include current gold rate</span></label></div>
+            <div class="fg"><label class="fl">Change Password</label></div>
+            <div class="fr2"><div class="fg"><input class="fi" type="password" id="old-pass" placeholder="Current password"/></div><div class="fg"><input class="fi" type="password" id="new-pass" placeholder="New password"/></div></div>
+            <button class="btn btn-out btn-sm" onclick="changePass()"><i class="ti ti-lock"></i>Change Password</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════ -->
+
+<!-- Invoice view modal (reused for orders, items) -->
+<div class="modal-bg" id="inv-modal">
+  <div class="modal"><div class="modal-hdr"><div class="modal-ttl">Details</div><button class="modal-cls" onclick="closeModal('inv-modal')">✕</button></div><div class="modal-body" id="inv-modal-body"></div><div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('inv-modal')">Close</button><button class="btn btn-out btn-sm" onclick="window.print()"><i class="ti ti-printer"></i>Print</button></div></div>
+</div>
+
+<!-- Special Order modal -->
+<div class="modal-bg" id="order-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl">New Special Order</div><button class="modal-cls" onclick="closeModal('order-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fr2"><div class="fg"><label class="fl">Customer</label><select class="fi" id="om-cust"><option value="">Walk-in</option></select></div><div class="fg"><label class="fl">Branch</label><select class="fi" id="om-branch"></select></div></div>
+      <div class="fg"><label class="fl">Description (EN)</label><textarea class="fi" rows="3" id="om-desc" placeholder="Describe the custom item..."></textarea></div>
+      <div class="fg"><label class="fl">Description (AR)</label><textarea class="fi" rows="2" id="om-desc-ar" placeholder="وصف القطعة..." style="direction:rtl"></textarea></div>
+      <div class="fr3"><div class="fg"><label class="fl">Karat</label><select class="fi" id="om-karat"><option>24K</option><option>22K</option><option selected>21K</option><option>18K</option><option>14K</option></select></div><div class="fg"><label class="fl">Approx. Weight (g)</label><input class="fi" type="number" id="om-weight" placeholder="0.00"/></div><div class="fg"><label class="fl">Advance Amount</label><input class="fi" type="number" id="om-advance" placeholder="0.000"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Due Date</label><input class="fi" type="date" id="om-due"/></div><div class="fg"><label class="fl">Estimated Total</label><input class="fi" type="number" id="om-total" placeholder="0.000"/></div></div>
+      <div class="fg"><label class="fl">Currency</label><select class="fi" id="om-curr"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option></select></div>
+      <div class="fg"><label class="fl">Reference Images</label><div class="upload-zone" style="padding:14px" onclick="document.getElementById('om-imgs').click()"><i class="ti ti-cloud-upload" style="font-size:20px;color:var(--tx3);display:block;margin-bottom:4px"></i><div style="font-size:11px;color:var(--tx3)">Upload reference images (optional)</div></div><input type="file" id="om-imgs" accept="image/*" multiple style="display:none"/></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('order-modal')">Cancel</button><button class="btn btn-gold" onclick="saveOrder()"><i class="ti ti-check"></i>Place Order</button></div>
+  </div>
+</div>
+
+<!-- User modal -->
+<div class="modal-bg" id="user-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="um-title">Add User</div><button class="modal-cls" onclick="closeModal('user-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="um-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="um-name"/></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="um-email"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Password <span id="um-pass-hint" style="color:var(--tx3);font-size:10px">(blank = keep current)</span></label><input class="fi" type="password" id="um-pass"/></div><div class="fg"><label class="fl">Phone</label><input class="fi" id="um-phone"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Role</label><select class="fi" id="um-role"><option value="1">Admin</option><option value="2">Manager</option><option value="3" selected>Cashier</option><option value="4">Inventory</option></select></div><div class="fg"><label class="fl">Branch</label><select class="fi" id="um-branch"><option value="">All Branches</option></select></div></div>
+      <div class="fg"><label class="fl">Status</label><select class="fi" id="um-active"><option value="1">Active</option><option value="0">Inactive</option></select></div>
+      <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:11px;color:var(--tx3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Role Permissions</div><div id="um-role-desc" style="font-size:12px;color:var(--tx2)"></div></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('user-modal')">Cancel</button><button class="btn btn-gold" onclick="saveUser()"><i class="ti ti-check"></i>Save User</button></div>
+  </div>
+</div>
+
+<!-- Customer add/edit modal -->
+<div class="modal-bg" id="cust-modal2">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="cm2-title">Add Customer</div><button class="modal-cls" onclick="closeModal('cust-modal2')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="cm2-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Full Name</label><input class="fi" id="cm2-name"/></div><div class="fg"><label class="fl">Phone</label><input class="fi" id="cm2-phone"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="cm2-email"/></div><div class="fg"><label class="fl">Nationality</label><input class="fi" id="cm2-nat" placeholder="e.g. Kuwaiti"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">ID Number</label><input class="fi" id="cm2-idn"/></div><div class="fg"><label class="fl">Branch</label><select class="fi" id="cm-branch"></select></div></div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" rows="2" id="cm2-notes"></textarea></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('cust-modal2')">Cancel</button><button class="btn btn-gold" onclick="saveCustomer2()"><i class="ti ti-check"></i>Save Customer</button></div>
+  </div>
+</div>
+
+<!-- Item Edit modal -->
+<div class="modal-bg" id="item-edit-modal">
+  <div class="modal" style="width:720px">
+    <div class="modal-hdr"><div class="modal-ttl">Edit Item</div><button class="modal-cls" onclick="closeModal('item-edit-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ei-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Item Name (EN)</label><input class="fi" id="ei-name"/></div><div class="fg"><label class="fl">Item Name (AR)</label><input class="fi" id="ei-name-ar" style="direction:rtl"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">SKU</label><input class="fi" id="ei-sku" readonly style="opacity:.6"/></div><div class="fg"><label class="fl">Category</label><select class="fi" id="ei-cat"></select></div></div>
+      <div class="fr3"><div class="fg"><label class="fl">Karat</label><select class="fi" id="ei-karat"><option>24K</option><option>22K</option><option>21K</option><option>18K</option><option>14K</option><option>9K</option></select></div><div class="fg"><label class="fl">Weight (g)</label><input class="fi" type="number" step="0.01" id="ei-weight"/></div><div class="fg"><label class="fl">Making (%)</label><input class="fi" type="number" id="ei-making"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Status</label><select class="fi" id="ei-active"><option value="1">Active</option><option value="0">Inactive</option></select></div></div>
+      <div class="fg"><label class="fl">Description (EN)</label><textarea class="fi" rows="2" id="ei-desc"></textarea></div>
+      <div class="fg"><label class="fl">Description (AR)</label><textarea class="fi" rows="2" id="ei-desc-ar" style="direction:rtl"></textarea></div>
+      <div class="fg"><label class="fl">Stock per Branch</label><div id="ei-stock-grid"></div></div>
+      <div class="fg"><label class="fl">Current Images</label><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px" id="ei-img-prev"></div><label class="fl">Add More Images</label><input type="file" class="fi" id="ei-imgs" accept="image/*" multiple/></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('item-edit-modal')">Cancel</button><button class="btn btn-gold" onclick="saveItemEdit()"><i class="ti ti-check"></i>Save Changes</button></div>
+  </div>
+</div>
+
+<!-- Branch add/edit modal -->
+<div class="modal-bg" id="branch-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="bm-title">Add Branch</div><button class="modal-cls" onclick="closeModal('branch-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="bm-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Branch Name</label><input class="fi" id="bm-name" placeholder="Kuwait City Main"/></div><div class="fg"><label class="fl">Country</label><select class="fi" id="bm-country"><option value="1">🇰🇼 Kuwait</option><option value="2">🇸🇦 Saudi Arabia</option><option value="3">🇦🇪 UAE</option><option value="4">🇧🇭 Bahrain</option><option value="5">🇶🇦 Qatar</option><option value="6">🇴🇲 Oman</option></select></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">City</label><input class="fi" id="bm-city"/></div><div class="fg"><label class="fl">Manager Name</label><input class="fi" id="bm-manager"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Phone</label><input class="fi" id="bm-phone"/></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="bm-email"/></div></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('branch-modal')">Cancel</button><button class="btn btn-gold" onclick="saveBranch()"><i class="ti ti-check"></i>Save Branch</button></div>
+  </div>
+</div>
+
+<!-- Category modal -->
+<div class="modal-bg" id="cat-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="cm-title">New Category</div><button class="modal-cls" onclick="closeModal('cat-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="cm-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Name (EN)</label><input class="fi" id="cm-name" placeholder="Rings"/></div><div class="fg"><label class="fl">Name (AR)</label><input class="fi" id="cm-name-ar" placeholder="خواتم" style="direction:rtl"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Icon (emoji)</label><input class="fi" id="cm-icon" placeholder="💍" maxlength="4"/></div><div class="fg"><label class="fl">Sort Order</label><input class="fi" type="number" id="cm-sort" value="0"/></div></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('cat-modal')">Cancel</button><button class="btn btn-gold" onclick="saveCategory()"><i class="ti ti-check"></i>Save Category</button></div>
+  </div>
+</div>
+
+<!-- Supplier modal -->
+<div class="modal-bg" id="supplier-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl" id="sm-title">New Supplier</div><button class="modal-cls" onclick="closeModal('supplier-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="sm-id"/>
+      <div class="fr2"><div class="fg"><label class="fl">Name (EN)</label><input class="fi" id="sm-name"/></div><div class="fg"><label class="fl">Name (AR)</label><input class="fi" id="sm-name-ar" style="direction:rtl"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Country</label><input class="fi" id="sm-country" placeholder="Italy"/></div><div class="fg"><label class="fl">City</label><input class="fi" id="sm-city"/></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Contact Person</label><input class="fi" id="sm-contact"/></div><div class="fg"><label class="fl">Phone</label><input class="fi" id="sm-phone"/></div></div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="sm-email"/></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('supplier-modal')">Cancel</button><button class="btn btn-gold" onclick="saveSupplier()"><i class="ti ti-check"></i>Save Supplier</button></div>
+  </div>
+</div>
+
+<!-- Purchase Order modal -->
+<div class="modal-bg" id="purchase-modal">
+  <div class="modal" style="width:640px">
+    <div class="modal-hdr"><div class="modal-ttl">New Purchase Order</div><button class="modal-cls" onclick="closeModal('purchase-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="fr2"><div class="fg"><label class="fl">Branch</label><select class="fi" id="po-branch"></select></div><div class="fg"><label class="fl">Supplier</label><select class="fi" id="po-supplier"><option value="">Select supplier</option></select></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Order Date</label><input class="fi" type="date" id="po-date"/></div><div class="fg"><label class="fl">Currency</label><select class="fi" id="po-curr"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="USD">USD</option></select></div></div>
+      <div class="fg"><label class="fl">Items</label>
+        <div id="po-items-list"></div>
+        <button class="btn btn-out btn-sm" style="margin-top:8px" onclick="addPOItem()"><i class="ti ti-plus"></i>Add Item</button>
+      </div>
+      <div class="fg"><label class="fl">Notes</label><textarea class="fi" rows="2" id="po-notes"></textarea></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('purchase-modal')">Cancel</button><button class="btn btn-gold" onclick="savePurchase()"><i class="ti ti-check"></i>Create PO</button></div>
+  </div>
+</div>
+
+<!-- Return modal -->
+<div class="modal-bg" id="return-modal">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-ttl">Process Return</div><button class="modal-cls" onclick="closeModal('return-modal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ret-inv-id"/>
+      <div style="background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:var(--tx2)">Invoice: <strong id="ret-inv-num" style="color:var(--gold)"></strong></div>
+      <div class="fr2"><div class="fg"><label class="fl">Return Type</label><select class="fi" id="ret-type"><option value="full">Full Return</option><option value="partial">Partial Return</option></select></div><div class="fg"><label class="fl">Refund Method</label><select class="fi" id="ret-method"><option value="cash">Cash</option><option value="card">Card</option><option value="store_credit">Store Credit</option><option value="bank_transfer">Bank Transfer</option></select></div></div>
+      <div class="fr2"><div class="fg"><label class="fl">Refund Amount</label><input class="fi" type="number" step="0.001" id="ret-amount" placeholder="0.000"/></div><div class="fg"><label class="fl">Currency</label><select class="fi" id="ret-curr"><option value="KWD">KWD</option><option value="SAR">SAR</option><option value="AED">AED</option><option value="BHD">BHD</option><option value="QAR">QAR</option><option value="OMR">OMR</option></select></div></div>
+      <div class="fg"><label class="fl">Reason</label><textarea class="fi" rows="2" id="ret-reason" placeholder="Reason for return..."></textarea></div>
+      <div class="fg"><label class="fl">Notes</label><input class="fi" id="ret-notes" placeholder="Additional notes..."/></div>
+    </div>
+    <div class="modal-ftr"><button class="btn btn-out" onclick="closeModal('return-modal')">Cancel</button><button class="btn btn-gold" onclick="saveReturn()"><i class="ti ti-check"></i>Submit Return</button></div>
+  </div>
+</div>
+
+<!-- Success modal -->
+<div class="modal-bg" id="success-modal">
+  <div class="modal" style="width:340px;text-align:center">
+    <div class="modal-body" style="padding:32px">
+      <div style="font-size:52px;margin-bottom:12px">✅</div>
+      <div style="font-family:Georgia,serif;font-size:20px;color:var(--gold);margin-bottom:8px" id="sm-title">Done!</div>
+      <div style="font-size:13px;color:var(--tx2)" id="sm-msg"></div>
+      <div style="margin-top:20px;display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-out" onclick="closeModal('success-modal')">Close</button>
+        <button class="btn btn-gold" id="sm-action" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="modal-bg" id="conf-modal">
+  <div class="modal" style="width:360px">
+    <div class="modal-hdr"><div class="modal-ttl" id="conf-title">Confirm</div><button class="modal-cls" onclick="closeModal('conf-modal')">✕</button></div>
+    <div class="modal-body"><div style="font-size:14px;color:var(--tx2);line-height:1.6" id="conf-msg"></div></div>
+    <div class="modal-ftr"><button class="btn btn-out" id="conf-no">Cancel</button><button class="btn btn-gold" id="conf-yes"><i class="ti ti-check"></i>Confirm</button></div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
