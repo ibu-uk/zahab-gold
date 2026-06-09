@@ -34,8 +34,8 @@ router.get('/', auth, async (req, res) => {
     if (customer_id) { sql += ' AND inv.customer_id = ?'; params.push(customer_id); }
     if (from_date)   { sql += ' AND DATE(inv.created_at) >= ?'; params.push(from_date); }
     if (to_date)     { sql += ' AND DATE(inv.created_at) <= ?'; params.push(to_date); }
-    sql += ' GROUP BY inv.id ORDER BY inv.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), (parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||50, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` GROUP BY inv.id ORDER BY inv.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch (e) { res.status(500).json({ error: e.message }); }

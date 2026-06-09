@@ -24,8 +24,8 @@ router.get('/', auth, role('admin','manager','cashier'), async (req, res) => {
     const bid = req.user.permissions.includes('all') ? branch_id : req.user.branch_id;
     if (bid)    { sql += ' AND ip.branch_id=?'; params.push(bid); }
     if (status) { sql += ' AND ip.status=?';    params.push(status); }
-    sql += ' ORDER BY ip.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit),(parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||50, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` ORDER BY ip.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch(e){ res.status(500).json({error:e.message}); }

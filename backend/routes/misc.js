@@ -48,8 +48,8 @@ router.get('/customers', auth, async (req, res) => {
     const params = [];
     if (search) { sql += ' AND (c.name LIKE ? OR c.phone LIKE ? OR c.id_number LIKE ?)'; params.push('%'+search+'%','%'+search+'%','%'+search+'%'); }
     if (branch_id) { sql += ' AND c.branch_id=?'; params.push(branch_id); }
-    sql += ' ORDER BY c.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit),(parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||100, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` ORDER BY c.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch(e){ res.status(500).json({error:e.message}); }
@@ -296,8 +296,8 @@ router.get('/audit-log', auth, role('admin'), async (req, res) => {
     const params = [];
     if (user_id) { sql += ' AND al.user_id=?'; params.push(user_id); }
     if (module)  { sql += ' AND al.module=?';  params.push(module); }
-    sql += ' ORDER BY al.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit),(parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||50, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` ORDER BY al.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch(e){ res.status(500).json({error:e.message}); }

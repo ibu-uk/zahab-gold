@@ -25,8 +25,8 @@ router.get('/', auth, role('admin','manager','cashier'), async (req, res) => {
     if (bid)       { sql += ' AND bb.branch_id=?';             params.push(bid); }
     if (from_date) { sql += ' AND DATE(bb.created_at)>=?';     params.push(from_date); }
     if (to_date)   { sql += ' AND DATE(bb.created_at)<=?';     params.push(to_date); }
-    sql += ' ORDER BY bb.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit),(parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||50, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` ORDER BY bb.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch(e){ res.status(500).json({error:e.message}); }

@@ -33,8 +33,8 @@ router.get('/', auth, async (req, res) => {
     const bid = req.user.permissions.includes('all') ? branch_id : req.user.branch_id;
     if (bid)    { sql += ' AND so.branch_id = ?'; params.push(bid); }
     if (status) { sql += ' AND so.status = ?';    params.push(status); }
-    sql += ' ORDER BY so.created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), (parseInt(page)-1)*parseInt(limit));
+    const lim = parseInt(limit)||50, off = ((parseInt(page)||1)-1)*lim;
+    sql += ` ORDER BY so.created_at DESC LIMIT ${lim} OFFSET ${off}`;
     const [rows] = await db.execute(sql, params);
     res.json({ data: rows });
   } catch (e) { res.status(500).json({ error: e.message }); }
