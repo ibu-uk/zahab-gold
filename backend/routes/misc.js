@@ -260,7 +260,7 @@ router.get('/reports/sales-summary', auth, role('admin','manager'), async (req, 
        FROM invoices inv JOIN branches b ON b.id=inv.branch_id
        WHERE DATE(inv.created_at) BETWEEN ? AND ? AND inv.payment_status='paid' ${branchFilter}
        GROUP BY inv.branch_id, inv.currency_code ORDER BY revenue DESC`,
-      bid ? [from, to, bid] : [from, to]
+      params
     );
     const [byDay] = await db.execute(
       `SELECT DATE(inv.created_at) AS day, SUM(inv.total) AS revenue, COUNT(*) AS invoices
@@ -375,18 +375,16 @@ router.get('/dashboard/stats', auth, async (req, res) => {
        WHERE DATE(inv.created_at)=? AND inv.payment_status='paid' ${bFilter}`,
       [today, ...bp]
     );
-    const [[ordStat]] = await db.execute(
-      `SELECT COUNT(*) AS total,
+    const ordSql = `SELECT COUNT(*) AS total,
               SUM(status='pending') AS pending,
               SUM(status IN('design','fabrication','quality')) AS in_progress,
               SUM(status='ready') AS ready
-       FROM special_orders WHERE 1=1 ${bid ? 'AND branch_id=?' : ''}`, bid ? [bid] : []
-    );
-    const [[lowStock]] = await db.execute(
-      `SELECT COUNT(*) AS cnt FROM item_branch_stock ibs
+       FROM special_orders WHERE 1=1 ${bid ? 'AND branch_id=?' : ''}`;
+    const [[ordStat]] = bid ? await db.execute(ordSql, [bid]) : await db.execute(ordSql);
+    const lowSql = `SELECT COUNT(*) AS cnt FROM item_branch_stock ibs
        JOIN items i ON i.id=ibs.item_id AND i.is_active=1
-       WHERE ibs.qty <= ibs.min_qty ${bid ? 'AND ibs.branch_id=?' : ''}`, bid ? [bid] : []
-    );
+       WHERE ibs.qty <= ibs.min_qty ${bid ? 'AND ibs.branch_id=?' : ''}`;
+    const [[lowStock]] = bid ? await db.execute(lowSql, [bid]) : await db.execute(lowSql);
     const [[overdueInst]] = await db.execute(
       `SELECT COUNT(*) AS cnt FROM installment_payments WHERE status IN('pending','overdue') AND due_date < CURDATE()`
     );
