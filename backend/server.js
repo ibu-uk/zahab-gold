@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 const ALLOWED = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || ALLOWED.includes(origin) || process.env.NODE_ENV === 'development') return cb(null, true);
+    if (!origin || ALLOWED.includes('*') || ALLOWED.includes(origin) || process.env.NODE_ENV === 'development') return cb(null, true);
     cb(new Error('CORS policy violation'));
   },
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
